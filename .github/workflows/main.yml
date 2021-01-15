@@ -4,7 +4,7 @@ name: hdf5 dev CI
 on:
   workflow_dispatch:
   push:
-    branches: [ develop, hdf5_1_12, hdf5_1_10, hdf5_1_8 ]
+    branches: [ develop, hdf5_1_12, hdf5_1_10, hdf5_1_8, 'lkurz/**' ]
     paths-ignore:
     - '.github/**'
     - 'doc/**'
@@ -17,7 +17,7 @@ jobs:
     strategy:
 #      fail-fast: false
       matrix:
-        name: ["Windows Latest MSVC", "Ubuntu Latest GCC", "Ubuntu Debug GCC", "macOS Latest Clang", "Ubuntu Autotools GCC"]
+        name: ["Windows Latest MSVC", "Ubuntu Latest GCC", "Ubuntu Debug GCC", "macOS Latest Clang", "Ubuntu Autotools GCC", "macOS BigSur Clang"]
         include:
           - name: "Windows Latest MSVC"
             artifact: "Windows-MSVC.tar.xz"
@@ -71,6 +71,16 @@ jobs:
 #            parallel: ON
 #            toolchain: "config/toolchain/GCC.cmake"
 #            generator: "-G Ninja"
+          - name: "macOS BigSur Clang"
+            artifact: "macOS-11.tar.xz"
+            os: macos-11.0
+            build_type: "Release"
+            cpp: ON
+            fortran: OFF
+            parallel: OFF
+            toolchain: "config/toolchain/clang.cmake"
+            generator: "-G Ninja"
+
 
     name: ${{ matrix.name }}
     # The type of runner that the job will run on
@@ -90,7 +100,7 @@ jobs:
       if: matrix.os == 'windows-latest'
     - name: Install Dependencies (macOS)
       run: brew install ninja
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-**'
     - name: Set environment for MSVC (Windows)
       if:  matrix.os == 'windows-latest'
       run: |
